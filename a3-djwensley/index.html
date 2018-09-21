@@ -1,0 +1,129 @@
+<html>
+<div>
+<p> Register a new patient </p>
+<form>
+  Name
+  <input id="NameReg" type="text">
+  Birthdate
+  <input id="BirthdateReg" type="text"> <br>
+  <button id="register">Register</button>
+</form>
+</div>
+<div>
+<p> Move a patient to another room </p>
+<form>
+  Name
+  <input id="NameMov" type="text">
+  Birthdate
+  <input id="BirthdateMov" type="text">
+  New Room
+  <input id="RoomMov" type="text"> <br>
+  <button id="move">
+  Move Patient
+  </button>
+</form>
+</div>
+<div>
+<p> Check a Patient out </p>
+<form>
+  Name
+  <input id="NameDel" type="text">
+  Birthdate
+  <input id="BirthdateDel" type="text"> <br>
+  <button id="check out">
+  Check Patient out
+  </button>
+</form>
+</div>
+Patient Directory<br>
+<div id="results">
+</div>
+<script>
+var patient_arr = [];
+read();
+
+document.getElementById('register').addEventListener('click', function(evt2) {
+  var patient = {};
+  patient.id = '1'
+  patient.Name = document.getElementById('NameReg').value;
+  patient.Birthdate = document.getElementById('BirthdateReg').value;
+  patient.Room = 'Lobby'
+  create(patient);
+  event.preventDefault();
+});
+
+document.getElementById('check out').addEventListener('click', function(evt3) {
+  console.log('Button Function')
+  var patient = {};
+  patient.id = '1'
+  patient.Name = document.getElementById('NameDel').value;
+  patient.Birthdate = document.getElementById('BirthdateDel').value;
+  patient.Room = 'Lobby'
+  del(patient);
+  event.preventDefault();
+});
+
+document.getElementById('move').addEventListener('click', function(evt3) {
+  console.log('Button Function')
+  var patient = {};
+  patient.id = '1'
+  patient.Name = document.getElementById('NameMov').value;
+  patient.Birthdate = document.getElementById('BirthdateMov').value;
+  patient.Room = document.getElementById('RoomMov').value;
+  update(patient);
+  event.preventDefault();
+});
+
+function build( patient_arr ) {
+  var results_html = `${
+    patient_arr.map(patient =>
+      `
+       <div id=${patient.id}> 
+        <span>Name: ${patient.Name}, </span> 
+        <span>Birthdate: ${patient.Birthdate}, </span> 
+		<span>Room: ${patient.Room} </span>
+       </div>
+      `
+    ).join('')
+  }`
+  document.getElementById('results').innerHTML = results_html;
+}
+
+function read() {
+  var request = new XMLHttpRequest();
+  request.open('GET', '/read');
+  request.responseType = 'json';
+  request.onload = function() {
+    patient_arr = request.response;
+    build( patient_arr );
+  };
+  request.send();
+  
+}
+
+function update( patient ) {
+  var request = new XMLHttpRequest();
+  request.open('PUT', '/update');
+  request.responseType = 'text';
+  request.onload = function() { console.log('done!'); read(); }
+  request.send( JSON.stringify(patient) );
+}
+
+function create(patient) {
+  var request = new XMLHttpRequest();
+  request.open('PUT', '/create');
+  request.responseType = 'text';
+  request.onload = function() { console.log('done!'); read(); }
+  request.send( JSON.stringify(patient) );
+}
+
+function del(hospital) {
+  var request = new XMLHttpRequest();
+  request.open('PUT', '/del');
+  request.responseType = 'text';
+  request.onload = function() { console.log('done!'); read(); }
+  request.send( JSON.stringify(hospital) );
+}
+</script>
+
+</html>
